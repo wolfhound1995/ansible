@@ -1,0 +1,44 @@
+---
+- name: Install and configure HTTP server
+  hosts: webservers
+  become: yes
+
+  tasks:
+    - name: Update package cache
+      ansible.builtin.apt:
+        update_cache: yes
+      when: ansible_distribution == 'Debian'
+
+    - name: Install Apache on Debian
+      ansible.builtin.apt:
+        name: apache2
+        state: present
+      when: ansible_distribution == 'Debian'
+
+    - name: Install Apache on CentOS
+      ansible.builtin.yum:
+        name: httpd
+        state: present
+      when: ansible_distribution == 'CentOS'
+
+    - name: Start and enable Apache
+      ansible.builtin.service:
+        name: "{{ apache_service }}"
+        state: started
+        enabled: yes
+      vars:
+        apache_service: "{{ 'apache2' if ansible_distribution == 'Debian' else 'httpd' }}"
+
+    - name: Upload website content
+      ansible.builtin.copy:
+        src: /path/to/your/website/files
+        dest: /var/www/html/
+        remote_src: yes
+      notify:
+        - Reload Apache
+
+  handlers:
+    - name: Reload Apache
+      ansible.builtin.service:
+        name: "{{ apache_service }}"
+        state: reloaded
