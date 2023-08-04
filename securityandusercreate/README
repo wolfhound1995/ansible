@@ -1,0 +1,16 @@
+Create a Limited Privilege User: Create a new user with limited privileges specifically 
+for Ansible to use. This user will have sudo access to perform necessary tasks.
+
+Configure SSH for the New User: Set up SSH access for the new user by copying 
+your SSH public key to the users ~/.ssh/authorized_keys file on the target hosts.
+
+Update Ansible Configuration: In your Ansible configuration, specify the new user 
+as the remote user to connect with when running playbooks. You can set this in 
+your ansible.cfg file or directly in your playbooks.
+
+Make sure to replace "{{ lookup('file', '~/.ssh/id_rsa.pub') }}" with the actual 
+path to your SSH public key. This playbook creates a new user named ansibleuser, 
+gives them sudo access, copies your SSH public key to their authorized_keys file, and configures the SSH server accordingly.
+
+After setting up the new user, you can use this user's credentials in your Ansible 
+configuration (ansible.cfg) or specify it in your playbook using the remote_user parameter.
