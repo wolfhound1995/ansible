@@ -1,0 +1,7 @@
+This playbook performs the following tasks:
+
+Installs Docker on the target hosts based on the distribution.
+Starts the Docker service.
+Copies the Docker image file to the target hosts.
+Loads the Docker image from the file.
+Starts a Docker container from the loaded image, exposing port 80.
