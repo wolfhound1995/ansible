@@ -1,0 +1,51 @@
+---
+- name: Apply Basic Security Configurations and User Setup
+  hosts: all
+  become: yes
+  
+  tasks:
+    - name: Set up firewall rules
+      ansible.builtin.firewalld:
+        zone: public
+        permanent: yes
+        state: enabled
+        immediate: yes
+        service: http
+      when: ansible_distribution == 'CentOS'
+
+    - name: Enable and start firewall on Debian
+      ansible.builtin.service:
+        name: ufw
+        state: started
+        enabled: yes
+      when: ansible_distribution == 'Debian'
+
+    - name: Ensure SSH server config is hardened
+      ansible.builtin.replace:
+        path: /etc/ssh/sshd_config
+        regexp: '(#*)(\s*)(PermitRootLogin)(.*)'
+        replace: 'PermitRootLogin no'
+        backup: yes
+      notify:
+        - Reload SSH
+
+    - name: Create limited privilege user
+      ansible.builtin.user:
+        name: ansibleuser
+        state: present
+        groups: sudo
+        append: yes
+        createhome: yes
+
+    - name: Copy SSH public key for ansibleuser
+      ansible.builtin.copy:
+        content: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+        dest: "/home/ansibleuser/.ssh/authorized_keys"
+        owner: ansibleuser
+        mode: '0600'
+
+  handlers:
+    - name: Reload SSH
+      ansible.builtin.service:
+        name: sshd
+        state: reloaded
