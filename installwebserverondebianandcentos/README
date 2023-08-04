@@ -1,0 +1,7 @@
+In this playbook, the ansible.builtin.copy module is used to copy the website content from the master machine to the target webservers. Adjust the src path to point to the directory containing your website files. The dest path should be the directory where the web server serves content (usually /var/www/html/ for Apache).
+
+The handlers section includes a handler to reload the Apache service after uploading the website content. This ensures that the new content is picked up by the web server.
+
+Remember to replace /path/to/your/website/files with the actual path to your website content on the Ansible control machine.
+
+Make sure your inventory is set up correctly and that your SSH keys are properly configured to allow Ansible to connect to the target hosts.
